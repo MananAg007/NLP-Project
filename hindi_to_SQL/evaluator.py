@@ -29,9 +29,9 @@ class HydraEvaluator():
         acc = {k:0.0 for k in items}
         sq = []
         cnt = 0
-        print("before_inf")
+        # print("before_inf")
         model_outputs = self.model.dataset_inference(eval_data)
-        print("after_inf")
+        # print("after_inf")
         for input_feature, model_output in zip(eval_data.input_features, model_outputs):
             cur_acc = {k:1 for k in acc if k != "overall"}
 

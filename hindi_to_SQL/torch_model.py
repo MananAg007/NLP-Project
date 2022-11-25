@@ -139,11 +139,11 @@ class HydraNet(nn.Module):
                 attention_mask=input_mask,
                 token_type_ids=segment_ids,
                 return_dict=False)
-        print("pooled output before: ")
-        print(pooled_output.shape)
+        # print("pooled output before: ")
+        # print(pooled_output.shape)
 
-        print("bert output before: ")
-        print(bert_output.shape)
+        # print("bert output before: ")
+        # print(bert_output.shape)
 
         bert_output = self.projection(bert_output)
         pooled_output = self.projection(pooled_output)
