@@ -29,7 +29,9 @@ def create_base_model(config):
     else:
         raise Exception("base_class {0} not supported".format(config["base_class"]))
 
-
+def create_bert_model():
+    weights_name = pretrained_weights[("bert", "base")]
+    return transformers.BertModel.from_pretrained(weights_name)
 
 def read_conf(conf_path):
     config = {}

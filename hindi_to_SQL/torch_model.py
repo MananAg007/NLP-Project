@@ -53,7 +53,7 @@ class HydraTorch(BaseModel):
         model_outputs = {}
         batch_size = 64 # 512
         for start_idx in range(0, model_inputs["input_ids"].shape[0], batch_size):
-            input_tensor = {k: torch.from_numpy(model_inputs[k][start_idx:start_idx+batch_size]).to(self.device) for k in ["input_ids", "input_mask", "segment_ids"]}
+            input_tensor = {k: torch.from_numpy(model_inputs[k][start_idx:start_idx+batch_size]).to(self.device) for k in ["input_ids", "input_mask", "segment_ids", "input_ids_eng", "input_mask_eng", "segment_ids_eng"]}
             with torch.no_grad():
                 model_output = self.model(**input_tensor)
             for k, out_tensor in model_output.items():
@@ -91,6 +91,7 @@ class HydraNet(nn.Module):
         super(HydraNet, self).__init__()
         self.config = config
         self.base_model = create_base_model(config)
+        self.bert_model = create_bert_model()
         
 
         # #=====Hack for RoBERTa model====
@@ -105,8 +106,11 @@ class HydraNet(nn.Module):
 
         bert_hid_size = self.base_model.config.hidden_size
         projected_size = 64
+
+        bert_english_hid_size = self.bert_model.config.hidden_size
         
-        self.projection = nn.Linear(bert_hid_size, projected_size)
+        self.projection = nn.Linear(bert_hid_size, int(projected_size/4))
+        self.projection_english = nn.Linear(bert_english_hid_size, int(projected_size*3/4))
         self.column_func = nn.Linear(projected_size, 3)
         self.agg = nn.Linear(projected_size, int(config["agg_num"]))
         self.op = nn.Linear(projected_size, int(config["op_num"]))
@@ -119,7 +123,7 @@ class HydraNet(nn.Module):
         # self.where_num = nn.Linear(bert_hid_size, int(config["where_column_num"]) + 1)
         # self.start_end = nn.Linear(bert_hid_size, 2)
 
-    def forward(self, input_ids, input_mask, segment_ids, agg=None, select=None, where=None, where_num=None, op=None, value_start=None, value_end=None):
+    def forward(self, input_ids, input_mask, segment_ids, input_ids_eng, input_mask_eng, segment_ids_eng, agg=None, select=None, where=None, where_num=None, op=None, value_start=None, value_end=None):
         # print("[inner] input_ids size:", input_ids.size())
         if self.config["base_class"] == "roberta":
             bert_output, pooled_output = self.base_model(
@@ -132,6 +136,11 @@ class HydraNet(nn.Module):
                 input_ids=input_ids,
                 attention_mask=input_mask,
                 token_type_ids=segment_ids,
+                return_dict=False)
+            bert_english, pooled_english = self.bert_model(
+                input_ids=input_ids_eng,
+                attention_mask=input_mask_eng,
+                token_type_ids=segment_ids_eng,
                 return_dict=False)
         else:
             bert_output, pooled_output = self.base_model(
@@ -147,7 +156,11 @@ class HydraNet(nn.Module):
 
         bert_output = self.projection(bert_output)
         pooled_output = self.projection(pooled_output)
+
+        bert_english = self.projection_english(bert_english)
+        pooled_english = self.projection_english(pooled_english)
         
+        # print("pehgle")
         # print("pooled output: ")
         # print(pooled_output.shape)
 
@@ -157,12 +170,24 @@ class HydraNet(nn.Module):
         bert_output = self.dropout(bert_output)
         pooled_output = self.dropout(pooled_output)
 
+        bert_output = torch.cat((bert_english, bert_output), -1)
+        pooled_output = torch.cat((pooled_english, pooled_output), -1)
+
+        # print("baad")
+        # print("pooled output: ")
+        # print(pooled_output.shape)
+
+        # print("bert output: ")
+        # print(bert_output.shape)
+
         column_func_logit = self.column_func(pooled_output)
         agg_logit = self.agg(pooled_output)
         op_logit = self.op(pooled_output)
         where_num_logit = self.where_num(pooled_output)
         start_end_logit = self.start_end(bert_output)
-        value_span_mask = input_mask.to(dtype=bert_output.dtype)
+        value_span_mask = input_mask_eng.to(dtype=bert_output.dtype)
+        # print("shape:: vsm: ", value_span_mask.shape)
+        # print("shape:: sel: ", start_end_logit[:, :, 0].shape)
         # value_span_mask[:, 0] = 1
         start_logit = start_end_logit[:, :, 0] * value_span_mask - 1000000.0 * (1 - value_span_mask)
         end_logit = start_end_logit[:, :, 1] * value_span_mask - 1000000.0 * (1 - value_span_mask)

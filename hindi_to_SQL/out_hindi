@@ -1,0 +1,136 @@
+[11-25 15:55:00] epoch 0, batch 0, batch_loss=10.3758
+1
+[11-25 15:55:25] epoch 0, batch 1, batch_loss=10.0903
+2
+[11-25 15:55:51] epoch 0, batch 2, batch_loss=9.9996
+3
+[11-25 15:56:26] epoch 0, batch 3, batch_loss=10.1885
+4
+[11-25 15:56:53] epoch 0, batch 4, batch_loss=10.2380
+5
+[11-25 15:57:26] epoch 0, batch 5, batch_loss=10.1057
+6
+[11-25 15:57:51] epoch 0, batch 6, batch_loss=10.2836
+7
+[11-25 15:58:24] epoch 0, batch 7, batch_loss=10.0097
+8
+[11-25 15:58:47] epoch 0, batch 8, batch_loss=10.1914
+9
+[11-25 15:59:21] epoch 0, batch 9, batch_loss=10.0930
+10
+[11-25 15:59:48] epoch 0, batch 10, batch_loss=10.2262
+11
+[11-25 16:00:19] epoch 0, batch 11, batch_loss=10.0553
+12
+[11-25 16:00:48] epoch 0, batch 12, batch_loss=10.1257
+13
+[11-25 16:01:20] epoch 0, batch 13, batch_loss=9.9452
+14
+[11-25 16:01:48] epoch 0, batch 14, batch_loss=10.3260
+15
+[11-25 16:02:19] epoch 0, batch 15, batch_loss=10.0701
+16
+[11-25 16:02:43] epoch 0, batch 16, batch_loss=10.0536
+17
+[11-25 16:03:14] epoch 0, batch 17, batch_loss=9.9805
+18
+[11-25 16:03:39] epoch 0, batch 18, batch_loss=10.0566
+19
+[11-25 16:04:09] epoch 0, batch 19, batch_loss=10.2335
+20
+[11-25 16:04:33] epoch 0, batch 20, batch_loss=10.1725
+21
+[11-25 16:05:02] epoch 0, batch 21, batch_loss=10.1235
+22
+[11-25 16:05:27] epoch 0, batch 22, batch_loss=10.1487
+23
+[11-25 16:05:56] epoch 0, batch 23, batch_loss=10.3606
+24
+[11-25 16:06:22] epoch 0, batch 24, batch_loss=9.9545
+25
+[11-25 16:06:53] epoch 0, batch 25, batch_loss=10.3437
+26
+[11-25 16:07:17] epoch 0, batch 26, batch_loss=10.2796
+27
+[11-25 16:07:50] epoch 0, batch 27, batch_loss=9.9970
+28
+[11-25 16:08:18] epoch 0, batch 28, batch_loss=10.1853
+29
+[11-25 16:08:52] epoch 0, batch 29, batch_loss=10.2611
+30
+[11-25 16:09:18] epoch 0, batch 30, batch_loss=10.1944
+31
+[11-25 16:09:53] epoch 0, batch 31, batch_loss=9.8317
+32
+[11-25 16:10:20] epoch 0, batch 32, batch_loss=10.0152
+33
+[11-25 16:10:55] epoch 0, batch 33, batch_loss=10.2330
+34
+[11-25 16:11:24] epoch 0, batch 34, batch_loss=10.4279
+35
+[11-25 16:12:00] epoch 0, batch 35, batch_loss=10.0424
+36
+[11-25 16:12:30] epoch 0, batch 36, batch_loss=9.9339
+37
+[11-25 16:13:03] epoch 0, batch 37, batch_loss=10.0672
+38
+[11-25 16:13:35] epoch 0, batch 38, batch_loss=10.1681
+39
+[11-25 16:14:08] epoch 0, batch 39, batch_loss=10.2682
+40
+[11-25 16:14:39] epoch 0, batch 40, batch_loss=10.1674
+41
+[11-25 16:15:06] epoch 0, batch 41, batch_loss=10.1467
+42
+[11-25 16:15:38] epoch 0, batch 42, batch_loss=10.0566
+43
+[11-25 16:16:03] epoch 0, batch 43, batch_loss=9.8980
+44
+[11-25 16:16:37] epoch 0, batch 44, batch_loss=10.0157
+45
+[11-25 16:17:06] epoch 0, batch 45, batch_loss=10.1934
+46
+[11-25 16:17:30] epoch 0, batch 46, batch_loss=10.0981
+47
+[11-25 16:17:59] epoch 0, batch 47, batch_loss=10.1360
+48
+[11-25 16:18:22] epoch 0, batch 48, batch_loss=10.0412
+49
+[11-25 16:18:50] epoch 0, batch 49, batch_loss=10.1814
+50
+[11-25 16:19:12] epoch 0, batch 50, batch_loss=10.3822
+51
+[11-25 16:19:42] epoch 0, batch 51, batch_loss=10.2300
+52
+[11-25 16:20:04] epoch 0, batch 52, batch_loss=10.1760
+53
+[11-25 16:20:33] epoch 0, batch 53, batch_loss=10.0691
+54
+[11-25 16:20:54] epoch 0, batch 54, batch_loss=10.1919
+55
+[11-25 16:21:24] epoch 0, batch 55, batch_loss=10.2190
+56
+[11-25 16:21:46] epoch 0, batch 56, batch_loss=9.9400
+57
+[11-25 16:22:17] epoch 0, batch 57, batch_loss=10.0200
+58
+[11-25 16:22:40] epoch 0, batch 58, batch_loss=10.1615
+59
+[11-25 16:23:09] epoch 0, batch 59, batch_loss=9.9025
+60
+[11-25 16:23:33] epoch 0, batch 60, batch_loss=10.1439
+61
+[11-25 16:24:01] epoch 0, batch 61, batch_loss=10.2860
+62
+[11-25 16:24:24] epoch 0, batch 62, batch_loss=9.8867
+63
+[11-25 16:24:54] epoch 0, batch 63, batch_loss=10.0731
+64
+[11-25 16:25:22] epoch 0, batch 64, batch_loss=10.1061
+65
+[11-25 16:25:57] epoch 0, batch 65, batch_loss=10.0060
+66
+[11-25 16:26:17] epoch 0, batch 66, batch_loss=10.0395
+67
+[11-25 16:26:46] epoch 0, batch 67, batch_loss=9.9833
+68

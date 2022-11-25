@@ -132,7 +132,10 @@ class InputFeature(object):
                  subword_to_word,
                  input_ids,
                  input_mask,
-                 segment_ids):
+                 segment_ids,
+                 input_ids_eng,
+                 input_mask_eng,
+                 segment_ids_eng):
         self.question = question
         self.table_id = table_id
         self.tokens = tokens
@@ -142,6 +145,9 @@ class InputFeature(object):
         self.input_ids = input_ids
         self.input_mask = input_mask
         self.segment_ids = segment_ids
+        self.input_ids_eng = input_ids_eng
+        self.input_mask_eng = input_mask_eng
+        self.segment_ids_eng = segment_ids_eng
 
         self.columns = None
         self.agg = None
@@ -196,7 +202,9 @@ class HydraFeaturizer(object):
         elif config["base_class"] == "albert":
             self.tokenizer = transformers.AlbertTokenizer.from_pretrained(weights_name)
         elif config["base_class"] == "muril":
+            weights_name = pretrained_weights[("bert", "base")]
             self.tokenizer = transformers.AutoTokenizer.from_pretrained('google/muril-base-cased',output_hidden_states=True)
+            self.bert_tokenizer = transformers.BertTokenizer.from_pretrained(weights_name)
         else:
             raise Exception("base_class {0} not supported".format(config["base_class"]))
         self.colType2token = {
@@ -211,6 +219,9 @@ class HydraFeaturizer(object):
             example.table_id,
             [],
             example.word_to_char_start,
+            [],
+            [],
+            [],
             [],
             [],
             [],
@@ -251,6 +262,14 @@ class HydraFeaturizer(object):
                     truncation_strategy="longest_first",
                     truncation=True,
                 )
+                tokenize_result_eng = self.bert_tokenizer.encode_plus(
+                    col_type + " " + column,
+                    tokens,
+                    padding="max_length",
+                    max_length=max_total_length,
+                    truncation_strategy="longest_first",
+                    truncation=True,
+                )
             else:
                 tokenize_result = self.tokenizer.encode_plus(
                     col_type + " " + column,
@@ -263,8 +282,10 @@ class HydraFeaturizer(object):
             # print("tokenizer r dekho: ", tokenize_result)
             input_ids = tokenize_result["input_ids"]
             input_mask = tokenize_result["attention_mask"]
+            input_ids_eng = tokenize_result_eng["input_ids"]
+            input_mask_eng = tokenize_result_eng["attention_mask"]
 
-            tokens = self.tokenizer.convert_ids_to_tokens(input_ids)
+            tokens = self.bert_tokenizer.convert_ids_to_tokens(input_ids_eng)
             column_token_length = 0
             if self.config["base_class"] == "roberta":
                 for i, token_id in enumerate(input_ids):
@@ -277,11 +298,12 @@ class HydraFeaturizer(object):
                         break
                     segment_ids[i] = 1
             else:
-                for i, token_id in enumerate(input_ids):
-                    if token_id == self.tokenizer.sep_token_id:
+                for i, token_id in enumerate(input_ids_eng):
+                    if token_id == self.bert_tokenizer.sep_token_id:
                         column_token_length = i + 1
                         break
                 segment_ids = tokenize_result["token_type_ids"]
+                segment_ids_eng = tokenize_result_eng["token_type_ids"]
 
             subword_to_word = [0] * column_token_length + subword_to_word
             word_to_subword = [(pos[0]+column_token_length, pos[1]+column_token_length) for pos in word_to_subword]
@@ -289,6 +311,9 @@ class HydraFeaturizer(object):
             assert len(input_ids) == max_total_length
             assert len(input_mask) == max_total_length
             assert len(segment_ids) == max_total_length
+            assert len(input_ids_eng) == max_total_length
+            assert len(input_mask_eng) == max_total_length
+            assert len(segment_ids_eng) == max_total_length
 
             input_feature.tokens.append(tokens)
             input_feature.word_to_subword.append(word_to_subword)
@@ -296,6 +321,9 @@ class HydraFeaturizer(object):
             input_feature.input_ids.append(input_ids)
             input_feature.input_mask.append(input_mask)
             input_feature.segment_ids.append(segment_ids)
+            input_feature.input_ids_eng.append(input_ids_eng)
+            input_feature.input_mask_eng.append(input_mask_eng)
+            input_feature.segment_ids_eng.append(segment_ids_eng)
 
         return input_feature
 
@@ -344,7 +372,7 @@ class HydraFeaturizer(object):
         return True
 
     def load_data(self, data_paths, config, include_label=False):
-        model_inputs = {k: [] for k in ["input_ids", "input_mask", "segment_ids"]}
+        model_inputs = {k: [] for k in ["input_ids", "input_mask", "segment_ids", "input_ids_eng", "input_mask_eng", "segment_ids_eng"]}
         if include_label:
             for k in ["agg", "select", "where_num", "where", "op", "value_start", "value_end"]:
                 model_inputs[k] = []
@@ -354,7 +382,10 @@ class HydraFeaturizer(object):
         for data_path in data_paths.split("|"):
             cnt = 0
             for line in open(data_path, encoding="utf8"):
-                example = SQLExample.load_from_json(line)
+                try:
+                    example = SQLExample.load_from_json(line)
+                except:
+                    continue
                 if not example.valid and include_label == True:
                     continue
 
@@ -374,6 +405,9 @@ class HydraFeaturizer(object):
                 model_inputs["input_ids"].extend(input_feature.input_ids)
                 model_inputs["input_mask"].extend(input_feature.input_mask)
                 model_inputs["segment_ids"].extend(input_feature.segment_ids)
+                model_inputs["input_ids_eng"].extend(input_feature.input_ids_eng)
+                model_inputs["input_mask_eng"].extend(input_feature.input_mask_eng)
+                model_inputs["segment_ids_eng"].extend(input_feature.segment_ids_eng)
                 if include_label:
                     model_inputs["agg"].extend(input_feature.agg)
                     model_inputs["select"].extend(input_feature.select)
