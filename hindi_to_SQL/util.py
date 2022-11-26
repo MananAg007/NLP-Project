@@ -15,6 +15,47 @@ pretrained_weights = {
     ("albert", "xlarge"): "albert-xlarge-v2"
 }
 
+def direct_agg_process(q):
+    # agg_ops = ['NA', 'MAX', 'MIN', 'COUNT', 'SUM', 'AVG']
+    mx = ["greatest","highest","biggest","largest","top","topmost","most","supreme","maximum","max"]
+    mn = ["bottom","lowermost","least","smallest","minimum","min"]
+    cnt = ["total","tally","count"]
+    sm = ["addition","gross","summation","aggregate","sum"]
+    av = ["mean","median","avg","average"]
+    for m in mx:
+        if m in q:
+            return 1
+    for m in mn:
+        if m in q:
+            return 2
+    for c in cnt:
+        if c in q:
+            return 3
+    for s in sm:
+        if s in q:
+            return 4
+    for a in av:
+        if a in q:
+            return 5
+    return -1
+
+def direct_op_process(q):
+    # cond_ops = ['=', '>', '<', 'OP']
+    eq = ["equal", "same"]
+    grt = ["greater", "larger", "bigger", "higher", "more", "over"]
+    lt = ["lesser", "less than", "smaller"]
+    for x in eq:
+        if x in q:
+            return 0
+    for x in grt:
+        if x in q:
+            return 1
+    for x in lt:
+        if x in q:
+            return 2
+    return -1
+    
+
 def create_base_model(config):
     if config["base_class"] != "muril":
         weights_name = pretrained_weights[(config["base_class"], config["base_name"])]

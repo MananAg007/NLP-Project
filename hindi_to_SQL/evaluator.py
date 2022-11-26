@@ -90,7 +90,9 @@ class HydraEvaluator():
 
         return result_str, sq
     
-    def pred_eval(self, eval_data: SQLDataset):
+    def pred_eval(self, eval_data: SQLDataset, info):
+        agg_ops = ['NA', 'MAX', 'MIN', 'COUNT', 'SUM', 'AVG']
+        cond_ops = ['=', '>', '<', 'OP']
         model_outputs = self.model.dataset_inference(eval_data)
         for input_feature, model_output in zip(eval_data.input_features, model_outputs):
             agg, select, where, conditions = self.model.parse_output(input_feature, model_output)
@@ -99,19 +101,32 @@ class HydraEvaluator():
             # while(ww<10):
             #     ww+=1
             pred_sq_list = pred_sq.split(", ")
+            if info[0] != -1:
+                agg = agg_ops[info[0]]
+            else:
+                agg = pred_sq_list[0]
+            if info[1] != -1:
+                cond = cond_ops[info[1]]
+            else:
+                cond = cond_ops[0]
             print("SQL output: ")
-            print("agg: ", pred_sq_list[0])
-            print("select column: ", pred_sq_list[1])
-            print("conditions: ", pred_sq_list[2])
+            # print("agg: ", agg)
+            # print("select column: ", pred_sq_list[1])
+            # print("conditions: ", pred_sq_list[2].replace(cond_ops[0], cond))
+            # print("\n-------------------")
+            if agg != "NA":
+                sql_out = "SELECT "+agg+"("+pred_sq_list[1]+") from table where "+pred_sq_list[2].replace(cond_ops[0], cond)
+            else:
+                sql_out = "SELECT "+pred_sq_list[1]+" from table where "+pred_sq_list[2].replace(cond_ops[0], cond)
+            print(sql_out)
             print("\n-------------------")
-
-
-    def eval(self, epochs):
+            return sql_out
+            
+    def eval(self, epochs, info=-1):
         # print(self.bad_case_dir)
         for eval_file in self.eval_data:
             if self.note != "":
-                self.pred_eval(self.eval_data[eval_file])
-                return
+                return self.pred_eval(self.eval_data[eval_file], info)
             result_str, sq = self._eval_imp(self.eval_data[eval_file])
             print(eval_file + ": " + result_str)
 
