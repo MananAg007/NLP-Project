@@ -66,58 +66,15 @@ def project_demo(hq, tid):
     artist_cols]
     col_metadata = tables[tid]
     model_path_demo = "models/hindi_model"
-    epoch_demo = 2
+    epoch_demo = 4
     config_demo = read_conf("wikisql_demo.conf")
     featurizer_demo = HydraFeaturizer(config_demo)
     model_demo = create_model(config_demo, is_train=False)
     model_demo.load(model_path_demo, epoch_demo)
     info = []
     create_json(hq, col_metadata, info)
+    info.append(tid)
     note = "_demo"
     evaluator_demo = HydraEvaluator(model_path_demo, config_demo, featurizer_demo, model_demo, note)
     return evaluator_demo.eval(epoch_demo, info)
 
-
-
-
-# # Put correct model path and epoch
-# model_path_demo = "models/hindi_model"
-# epoch_demo = 2
-# config_demo = read_conf("wikisql_demo.conf")
-# featurizer_demo = HydraFeaturizer(config_demo)
-# model_demo = create_model(config_demo, is_train=False)
-# model_demo.load(model_path_demo, epoch_demo)
-
-
-# week_rec_cols = [["Week", "real", None], ["Date", "string", None], ["Opponent", "string", None], ["Result", "string", None], ["Record", "string", None], ["Game Site", "string", None], ["Attendance", "real", None]]
-# race_cols = [["Season", "string", None], ["Series", "string", None], ["Team", "string", None], ["Races", "real", None], ["Wins", "real", None], ["Poles", "real", None], ["F/Laps", "real", None], ["Podiums", "real", None], ["Points", "real", None], ["Position", "string", None]]
-# party_cols = [["District", "string", None], ["Incumbent", "string", None], ["Party", "string", None], ["First elected", "real", None], ["Result", "string", None], ["Candidates", "string", None]]
-# artist_cols = [["Position", "real", None], ["Artist", "string", None], ["Song title", "string", None], ["Highest position", "real", None], ["Points", "real", None]]
-
-# hqs = ["कौन से दिनांक को 100 उपस्थिति थी",
-# "कौन से रिकॉर्ड में परिणाम असफल था",
-# "प्रतिध्वंधि क्लीवलैंड ब्राउन के लिए कुल सप्ताहों की गिनती बताएं ",
-# "17-50 के परिणाम के लिए रिकॉर्ड को नाम दें",
-# "19 सितंबर, 1976 के दिन कितनी हाज़िरी थी",
-# "1.0 से अधिक डंडे वाली दौड़ में उसने कितने अंक जीते",
-# "किस पार्टी की पहली निर्वाचित संख्या 1939.0 से बड़ी है",
-# "कलाकार रे एडम्स कौन से सर्वोत्तम स्थान पर पहुंचे हैं",
-# "गाना शीर्षक नॉट टुडे के बिंदुओं का योग कितना है "
-# ]
-# col_metadatas = [week_rec_cols,
-# week_rec_cols,
-# week_rec_cols,
-# week_rec_cols,
-# week_rec_cols,
-# race_cols,
-# party_cols,
-# artist_cols,
-# artist_cols]
-
-# print("\n-------------------")
-# for hq, col_metadata in zip(hqs, col_metadatas):
-#     info = []
-#     create_json(hq, col_metadata, info)
-#     note = "_demo"
-#     evaluator_demo = HydraEvaluator(model_path_demo, config_demo, featurizer_demo, model_demo, note)
-#     evaluator_demo.eval(epoch_demo, info)

@@ -15,7 +15,8 @@ pretrained_weights = {
     ("albert", "xlarge"): "albert-xlarge-v2"
 }
 
-def direct_agg_process(q):
+def direct_agg_process(qq):
+    q = qq.lower()
     # agg_ops = ['NA', 'MAX', 'MIN', 'COUNT', 'SUM', 'AVG']
     mx = ["greatest","highest","biggest","largest","top","topmost","most","supreme","maximum","max"]
     mn = ["bottom","lowermost","least","smallest","minimum","min"]
@@ -39,7 +40,8 @@ def direct_agg_process(q):
             return 5
     return -1
 
-def direct_op_process(q):
+def direct_op_process(qq):
+    q = qq.lower()
     # cond_ops = ['=', '>', '<', 'OP']
     eq = ["equal", "same"]
     grt = ["greater", "larger", "bigger", "higher", "more", "over"]

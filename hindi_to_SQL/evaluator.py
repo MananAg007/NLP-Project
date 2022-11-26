@@ -155,9 +155,9 @@ class HydraEvaluator():
                 cond = cond_ops[0]
             print("SQL output: ")
             if agg != "NA":
-                sql_out = "SELECT "+agg+"("+pred_sq_list[1]+") from table where "+pred_sq_list[2].replace(cond_ops[0], cond)
+                sql_out = "SELECT "+agg+"("+pred_sq_list[1]+") FROM TABLE "+str(info[2])+" WHERE "+pred_sq_list[2].replace(cond_ops[0], cond)
             else:
-                sql_out = "SELECT "+pred_sq_list[1]+" from table where "+pred_sq_list[2].replace(cond_ops[0], cond)
+                sql_out = "SELECT "+pred_sq_list[1]+" FROM TABLE "+str(info[2])+" WHERE "+pred_sq_list[2].replace(cond_ops[0], cond)
             print(sql_out)
             print("\n-------------------")
             return sql_out

@@ -1,19 +1,25 @@
 
 
 # Import the required library
+import tkinter
+import tkinter.font as font
 from tkinter import *
 from tkinter import ttk
 from demo import *
+from indic_transliteration import sanscript
+from indic_transliteration.sanscript import transliterate
+
+
 
 # Create an instance of tkinter frame
 win=Tk()
-
+win.title("CS626 Hindi2SQL")
 
 # Set the geometry
-win.geometry("1200x600")
+win.geometry("1600x900")
 
 
-labelp=Label(win, text="Column Details", font=('Calibri 12'))
+labelp=Label(win, text="Column Details", font=('Calibri 20'))
 labelp.pack()
 
 
@@ -44,11 +50,11 @@ class Table:
         for i in range(total_rows):
             for j in range(total_columns):
                 if j==0:
-                    self.e = Entry(root, width= 14, fg='black',
-                               font=('Arial', 12, 'bold'))
+                    self.e = Entry(root, width= 14, fg='white',
+                               font=('Arial', 20, 'bold'))
                 else:
-                    self.e = Entry(root, width=12, fg='black',
-                               font=('Arial',12))
+                    self.e = Entry(root, width=12, fg='white',
+                               font=('Arial',20))
                 self.e.grid(row=i, column=j)
                 try:
                     self.e.insert(END, lst[i][j])
@@ -60,6 +66,8 @@ t= Table(frame1)
 
 def get_input():
     inp0 = text.get(1.0, "end-1c")
+
+    inp0 = transliterate(inp0, sanscript.ITRANS,sanscript.DEVANAGARI)
     inp1 = text2.get(1.0, "end-1c")
 
     op = project_demo(inp0, int(inp1))
@@ -70,27 +78,44 @@ def get_input():
 # Add a text widget
 
 # Create a Label widget
-label0=Label(win, text="हिंदी क्वेरी यहाँ लिखे", font=('Calibri 12'))
+label0=Label(win, text="हिंदी क्वेरी यहाँ लिखे", font=('Calibri 20'))
 label0.pack()
-text=Text(win, width=80, height=5)
+text=Text(win, width=100, height=8)
 text.insert(END, "")
 text.pack()
+Font_tuple = ("Calibri MS", 20)
+text.configure(font = Font_tuple)
 
 
 # Create a Label widget
-label1=Label(win, text="टेबल क्रमांक?", font=('Calibri 12'))
+label1=Label(win, text="टेबल क्रमांक?", font=('Calibri 20'))
 label1.pack()
-text2=Text(win, width=80, height=2)
+text2=Text(win, width=80, height=3)
 text2.insert(END, "")
 text2.pack()
+text2.configure(font = Font_tuple)
+
+def transliterate_hindi():
+    inp0 = text.get(1.0, "end-1c")
+
+    op = transliterate(inp0, sanscript.ITRANS,sanscript.DEVANAGARI)
+
+    label_hin.config(text= op)
+
+buttonFont = font.Font(family='Calibri', size=20, weight='bold')
+b=tkinter.Button(win, text="Transliterate", command=transliterate_hindi, font=buttonFont)
+b.pack()
 
 
-# Create a button to get the text input
-b=ttk.Button(win, text="Print", command=get_input)
+label_hin=Label(win, text="", font=('Calibri 20'), pady=20)
+label_hin.pack()
+
+
+b=tkinter.Button(win, text="Generate SQL", command=get_input, font=buttonFont)
 b.pack()
 
 # Create a Label widget
-label2=Label(win, text="", font=('Calibri 12'))
+label2=Label(win, text="", font=('Calibri 20'))
 label2.pack()
 
 win.mainloop()
