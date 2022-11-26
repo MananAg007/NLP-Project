@@ -9,6 +9,7 @@ class HydraEvaluator():
         self.model = model
         self.eval_history_file = os.path.join(output_path, "eval.log")
         self.bad_case_dir = os.path.join(output_path, "bad_cases"+note)
+        self.note = note
         if note == "":
             os.mkdir(output_path)
         if "DEBUG" not in config:
@@ -18,11 +19,18 @@ class HydraEvaluator():
                 f.write(note.rstrip() + "\n")
 
         self.eval_data = {}
-        for eval_path in config["dev_data_path"].split("|") + config["test_data_path"].split("|"):
-            eval_data = SQLDataset(eval_path, config, hydra_featurizer, True)
-            self.eval_data[os.path.basename(eval_path)] = eval_data
+        if note == "":
+            for eval_path in config["dev_data_path"].split("|") + config["test_data_path"].split("|"):
+                if note == "":
+                    eval_data = SQLDataset(eval_path, config, hydra_featurizer, True)
+                self.eval_data[os.path.basename(eval_path)] = eval_data
 
-            print("Eval Data file {0} loaded, sample num = {1}".format(eval_path, len(eval_data)))
+                print("Eval Data file {0} loaded, sample num = {1}".format(eval_path, len(eval_data)))
+        else:
+            for eval_path in config["test_data_path"].split("|"):
+                eval_data = SQLDataset(eval_path, config, hydra_featurizer, True)
+                self.eval_data[os.path.basename(eval_path)] = eval_data
+
 
     def _eval_imp(self, eval_data: SQLDataset, get_sq=True):
         items = ["overall", "agg", "sel", "wn", "wc", "op", "val"]
@@ -81,10 +89,29 @@ class HydraEvaluator():
         result_str = ", ".join(result_str)
 
         return result_str, sq
+    
+    def pred_eval(self, eval_data: SQLDataset):
+        model_outputs = self.model.dataset_inference(eval_data)
+        for input_feature, model_output in zip(eval_data.input_features, model_outputs):
+            agg, select, where, conditions = self.model.parse_output(input_feature, model_output)
+            pred_sq = input_feature.output_SQ(agg=agg, sel=select, conditions=[conditions[w] for w in where])
+            # ww=0
+            # while(ww<10):
+            #     ww+=1
+            pred_sq_list = pred_sq.split(", ")
+            print("SQL output: ")
+            print("agg: ", pred_sq_list[0])
+            print("select column: ", pred_sq_list[1])
+            print("conditions: ", pred_sq_list[2])
+            print("\n-------------------")
+
 
     def eval(self, epochs):
-        print(self.bad_case_dir)
+        # print(self.bad_case_dir)
         for eval_file in self.eval_data:
+            if self.note != "":
+                self.pred_eval(self.eval_data[eval_file])
+                return
             result_str, sq = self._eval_imp(self.eval_data[eval_file])
             print(eval_file + ": " + result_str)
 

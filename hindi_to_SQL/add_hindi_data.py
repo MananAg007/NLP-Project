@@ -13,6 +13,42 @@ def get_lists(q):
         ret2.append(ret2[i]+len(word)+1)
     return words, ret1, ret2[:-1]
 
+def replace_eng(q):
+    # agg_ops = ['NA', 'MAX', 'MIN', 'COUNT', 'SUM', 'AVG']
+    
+    q.replace("greatest", "max")
+    q.replace("highest", "max")
+    q.replace("biggest", "max")
+    q.replace("largest", "max")
+    q.replace("top", "max")
+    q.replace("topmost", "max")
+    q.replace("most", "max")
+    q.replace("supreme", "max")
+    q.replace("maximum", "max")    
+
+    q.replace("bottom", "min")    
+    q.replace("lowermost", "min")    
+    q.replace("least", "min") 
+    q.replace("smallest", "min")
+    q.replace("minimum", "min")    
+
+    q.replace("total", "count")
+    q.replace("tally", "count")
+    q.replace("bottom", "count")    
+
+    q.replace("addition", "sum")
+    q.replace("gross", "sum")    
+    q.replace("summation", "sum")    
+    q.replace("aggregate", "sum")  
+
+    q.replace("mean", "avg")
+    q.replace("median", "avg")
+    q.replace("midpoint", "avg")
+    q.replace("norm", "avg")
+    q.replace("standard", "avg")
+    q.replace("middle", "avg")
+
+    return q
 
 def dump_hindi():
     data_path  = "data/wikitrain_short.jsonl"
@@ -24,6 +60,7 @@ def dump_hindi():
             d = json.loads(line)
             result = translator.translate(d['question'], src='en', dest ='hi')
             d['question'] = translator.translate(result.text, src='hi', dest ='en').text
+            d['question'] = replace_eng(d['question'])
             wrds, r1, r2 = get_lists(d['question'])
             d['char_to_word'] = r1
             d['word_to_char_start'] = r2
@@ -60,6 +97,7 @@ def dump_hindi():
             d = json.loads(line)
             result = translator.translate(d['question'], src='en', dest ='hi')
             d['question'] = translator.translate(result.text, src='hi', dest ='en').text
+            d['question'] = replace_eng(d['question'])
             wrds, r1, r2 = get_lists(d['question'])
             d['char_to_word'] = r1
             d['word_to_char_start'] = r2
@@ -96,6 +134,7 @@ def dump_hindi():
             d = json.loads(line)
             result = translator.translate(d['question'], src='en', dest ='hi')
             d['question'] = translator.translate(result.text, src='hi', dest ='en').text
+            d['question'] = replace_eng(d['question'])
             wrds, r1, r2 = get_lists(d['question'])
             d['char_to_word'] = r1
             d['word_to_char_start'] = r2
@@ -122,28 +161,5 @@ def dump_hindi():
         except:
             pass
     file.close()
-
-def create_json():
-    # data_path  = "data/wikitrain.jsonl"
-    # file = open("train_hindi.jsonl", "w")
-    # i = 0
-    # for line in open(data_path, encoding="utf8"):
-    #     d = json.loads(line)
-    #     result = translator.translate(d['question'], src='en', dest ='hi')
-    #     strng = json.dumps(d)[:-1]+", \"hindi_question\": \""+result.text+"\"}\n"
-    #     file.write(strng)
-    #     print(i)
-    #     i+=1
-    # file.close()
-    # for line in open("train_hindi.jsonl", encoding="utf8"):
-    #     words = line.split(", ")
-    #     hq = words[0]
-    #     ti = words[1]
-    #     d = {}
-    #     d["qid"] = 0
-    #     d["question"] = translator.translate(hq, src='en', dest ='hi')
-    #     d["column_meta"] = 
-    pass
-
 
 dump_hindi()

@@ -352,7 +352,10 @@ class HydraFeaturizer(object):
         for colidx, column_meta in enumerate(example.column_meta):
             if column_meta[-1] == None:
                 continue
-            se = example.value_start_end[column_meta[-1]]
+            try:
+                se = example.value_start_end[column_meta[-1]]
+            except:
+                print("value labels not given")
             try:
                 s = input_feature.word_to_subword[colidx][se[0]][0]
                 input_feature.value_start[colidx] = s
@@ -435,9 +438,9 @@ class SQLDataset(torch_data.Dataset):
         self.featurizer = featurizer
         self.input_features, self.model_inputs, self.pos = self.featurizer.load_data(data_paths, config, include_label)
 
-        print("{0} loaded. Data shapes:".format(data_paths))
-        for k, v in self.model_inputs.items():
-            print(k, v.shape)
+        # print("{0} loaded. Data shapes:".format(data_paths))
+        # for k, v in self.model_inputs.items():
+        #     print(k, v.shape)
 
     def __len__(self):
         return self.model_inputs["input_ids"].shape[0]
