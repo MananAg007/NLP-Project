@@ -63,6 +63,7 @@ def get_input():
     inp1 = text2.get(1.0, "end-1c")
 
     op = project_demo(inp0, int(inp1))
+    print(op)
 
     label2.config(text= op)
 
