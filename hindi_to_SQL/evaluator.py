@@ -2,6 +2,7 @@ import os
 import numpy as np
 from featurizer import *
 from base_model import *
+from sklearn import metrics
 
 class HydraEvaluator():
     def __init__(self, output_path, config, hydra_featurizer: HydraFeaturizer, model:BaseModel, note=""):
@@ -10,11 +11,15 @@ class HydraEvaluator():
         self.eval_history_file = os.path.join(output_path, "eval.log")
         self.bad_case_dir = os.path.join(output_path, "bad_cases"+note)
         self.note = note
-        if note == "":
+        try:
             os.mkdir(output_path)
+        except:
+            pass
         if "DEBUG" not in config:
-            if note == "":
+            try:
                 os.mkdir(self.bad_case_dir)
+            except:
+                pass
             with open(self.eval_history_file, "w", encoding="utf8") as f:
                 f.write(note.rstrip() + "\n")
 
@@ -35,6 +40,19 @@ class HydraEvaluator():
     def _eval_imp(self, eval_data: SQLDataset, get_sq=True):
         items = ["overall", "agg", "sel", "wn", "wc", "op", "val"]
         acc = {k:0.0 for k in items}
+        agg_true = []
+        agg_pred = []
+        sel_true = []
+        sel_pred = []
+        op_true = []
+        op_pred = []
+        val_true = []
+        val_pred = []
+        wn_true = []
+        wn_pred = []
+        wc_true = []
+        wc_pred = []
+        
         sq = []
         cnt = 0
         # print("before_inf")
@@ -49,22 +67,35 @@ class HydraEvaluator():
             wc_label = [i for i, w in enumerate(input_feature.where) if w == 1]
 
             agg, select, where, conditions = self.model.parse_output(input_feature, model_output, wc_label)
+        
             if agg != agg_label:
                 cur_acc["agg"] = 0
+            agg_true.append(agg_label)
+            agg_pred.append(agg)
             if select != select_label:
                 cur_acc["sel"] = 0
+            sel_true.append(select_label)
+            sel_pred.append(select)
             if len(where) != wn_label:
                 cur_acc["wn"] = 0
+            wn_true.append(wn_label)
+            wn_pred.append(len(where))
             if set(where) != set(wc_label):
                 cur_acc["wc"] = 0
+            wc_true.append(str(set(wc_label)))
+            wc_pred.append(str(set(where)))
 
             for w in wc_label:
                 _, op, vs, ve = conditions[w]
                 if op != input_feature.op[w]:
                     cur_acc["op"] = 0
+                op_true.append(input_feature.op[w])
+                op_pred.append(op)
 
                 if vs != input_feature.value_start[w] or ve != input_feature.value_end[w]:
                     cur_acc["val"] = 0
+                val_true.append(str((input_feature.value_start[w], input_feature.value_end[w])))
+                val_pred.append(str((vs, ve)))
 
             for k in cur_acc:
                 acc[k] += cur_acc[k]
@@ -87,7 +118,20 @@ class HydraEvaluator():
             result_str.append(item + ":{0:.1f}".format(acc[item] * 100.0 / cnt))
 
         result_str = ", ".join(result_str)
-
+        feval = open("eval_out", "w")
+        feval.write("agg: ")
+        feval.write(metrics.classification_report(agg_true, agg_pred, digits=4))
+        feval.write("sel: ")
+        feval.write(metrics.classification_report(sel_true, sel_pred, digits=4))
+        feval.write("wn: ")
+        feval.write(metrics.classification_report(wn_true, wn_pred, digits=4))
+        feval.write("wc: ")
+        feval.write(metrics.classification_report(wc_true, wc_pred, digits=4))
+        feval.write("op: ")
+        feval.write(metrics.classification_report(op_true, op_pred, digits=4))
+        feval.write("val: ")
+        feval.write(metrics.classification_report(val_true, val_pred, digits=4))
+        feval.close()
         return result_str, sq
     
     def pred_eval(self, eval_data: SQLDataset, info):
@@ -110,10 +154,6 @@ class HydraEvaluator():
             else:
                 cond = cond_ops[0]
             print("SQL output: ")
-            # print("agg: ", agg)
-            # print("select column: ", pred_sq_list[1])
-            # print("conditions: ", pred_sq_list[2].replace(cond_ops[0], cond))
-            # print("\n-------------------")
             if agg != "NA":
                 sql_out = "SELECT "+agg+"("+pred_sq_list[1]+") from table where "+pred_sq_list[2].replace(cond_ops[0], cond)
             else:

@@ -13,46 +13,9 @@ def get_lists(q):
         ret2.append(ret2[i]+len(word)+1)
     return words, ret1, ret2[:-1]
 
-def replace_eng(q):
-    # agg_ops = ['NA', 'MAX', 'MIN', 'COUNT', 'SUM', 'AVG']
-    
-    q.replace("greatest", "max")
-    q.replace("highest", "max")
-    q.replace("biggest", "max")
-    q.replace("largest", "max")
-    q.replace("top", "max")
-    q.replace("topmost", "max")
-    q.replace("most", "max")
-    q.replace("supreme", "max")
-    q.replace("maximum", "max")    
-
-    q.replace("bottom", "min")    
-    q.replace("lowermost", "min")    
-    q.replace("least", "min") 
-    q.replace("smallest", "min")
-    q.replace("minimum", "min")    
-
-    q.replace("total", "count")
-    q.replace("tally", "count")
-    q.replace("bottom", "count")    
-
-    q.replace("addition", "sum")
-    q.replace("gross", "sum")    
-    q.replace("summation", "sum")    
-    q.replace("aggregate", "sum")  
-
-    q.replace("mean", "avg")
-    q.replace("median", "avg")
-    q.replace("midpoint", "avg")
-    q.replace("norm", "avg")
-    q.replace("standard", "avg")
-    q.replace("middle", "avg")
-
-    return q
-
 def dump_hindi():
-    data_path  = "data/wikitrain_short.jsonl"
-    file = open("train_hindi.jsonl", "w")
+    data_path  = "wikisql_data/wikitrain_short.jsonl"
+    file = open("hindi_data/wikitrain.jsonl", "w")
     print("train:")
     i = 0
     for line in open(data_path, encoding="utf8"):
@@ -60,7 +23,7 @@ def dump_hindi():
             d = json.loads(line)
             result = translator.translate(d['question'], src='en', dest ='hi')
             d['question'] = translator.translate(result.text, src='hi', dest ='en').text
-            d['question'] = replace_eng(d['question'])
+            # d['question'] = replace_eng(d['question'])
             wrds, r1, r2 = get_lists(d['question'])
             d['char_to_word'] = r1
             d['word_to_char_start'] = r2
@@ -88,8 +51,8 @@ def dump_hindi():
             pass
     file.close()
 
-    data_path  = "data/wikidev_short.jsonl"
-    file = open("dev_hindi.jsonl", "w")
+    data_path  = "wikisql_data/wikidev_short.jsonl"
+    file = open("hindi_data/wikidev.jsonl", "w")
     print("dev:")
     i = 0
     for line in open(data_path, encoding="utf8"):
@@ -97,7 +60,7 @@ def dump_hindi():
             d = json.loads(line)
             result = translator.translate(d['question'], src='en', dest ='hi')
             d['question'] = translator.translate(result.text, src='hi', dest ='en').text
-            d['question'] = replace_eng(d['question'])
+            # d['question'] = replace_eng(d['question'])
             wrds, r1, r2 = get_lists(d['question'])
             d['char_to_word'] = r1
             d['word_to_char_start'] = r2
@@ -125,8 +88,8 @@ def dump_hindi():
             pass
     file.close()
 
-    data_path  = "data/wikitest_short.jsonl"
-    file = open("test_hindi.jsonl", "w")
+    data_path  = "wikisql_data/wikitest_short.jsonl"
+    file = open("hindi_data/wikitest.jsonl", "w")
     print("test:")
     i = 0
     for line in open(data_path, encoding="utf8"):
@@ -134,7 +97,7 @@ def dump_hindi():
             d = json.loads(line)
             result = translator.translate(d['question'], src='en', dest ='hi')
             d['question'] = translator.translate(result.text, src='hi', dest ='en').text
-            d['question'] = replace_eng(d['question'])
+            # d['question'] = replace_eng(d['question'])
             wrds, r1, r2 = get_lists(d['question'])
             d['char_to_word'] = r1
             d['word_to_char_start'] = r2

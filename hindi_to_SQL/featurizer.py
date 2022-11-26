@@ -365,7 +365,7 @@ class HydraFeaturizer(object):
                 assert e < max_total_length and input_feature.input_mask[colidx][e] == 1
 
             except:
-                print("value span is out of range")
+                # print("value span is out of range")
                 return False
 
         # feature_sq = input_feature.output_SQ(return_str=False)
